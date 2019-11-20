@@ -36,7 +36,7 @@ def _find_python_with_py(python: str) -> typing.Optional[pathlib.Path]:
     if not py:
         raise PyUnavailable()
     code = "import sys; print(sys.executable)"
-    out = _get_command_output([str(py), "-{}".format(python), "-c", code])
+    out = _get_command_output([str(py), f"-{python}", "-c", code])
     if not out:
         return None
     return pathlib.Path(out)
