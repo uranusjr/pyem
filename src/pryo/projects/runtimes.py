@@ -48,17 +48,14 @@ class _VirtualEnvironment:
     def exists(self) -> bool:
         return self.root.is_dir()
 
-    def which(self, name: str) -> typing.Optional[str]:
-        path = _paths(self.root.joinpath("bin"), self.root.joinpath("Scripts"))
-        return shutil.which(name, path=path)
-
     @property
     def name(self) -> str:
         return self.root.name
 
     @property
     def python(self) -> pathlib.Path:
-        python = self.which("python")
+        path = _paths(self.root.joinpath("bin"), self.root.joinpath("Scripts"))
+        python = shutil.which("python", path=path)
         if python is None:
             raise _VirtualEnvironmentInvalid(self.root)
         return python

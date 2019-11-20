@@ -8,6 +8,5 @@ def run(project, options):
         runtime = project.find_runtime(options.spec)
     else:
         runtime = project.get_active_runtime()
-
-    args = [runtime.which(options.cmd), *options.args]
+    args = [options.cmd, *options.args]
     subprocess.run(args, env=runtime.derive_environ(), check=True)
