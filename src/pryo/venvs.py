@@ -2,12 +2,7 @@ __all__ = ["activate", "add", "remove", "show_all"]
 
 import typing
 
-import structlog
-
 from .projects import Project, Runtime
-
-
-logger = structlog.get_logger()
 
 
 def _find_runtime_match(
