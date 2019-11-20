@@ -2,6 +2,10 @@
 Pryo: Project-level virtual environment management
 ==================================================
 
+Pryo manages multiple virtual environments local to projects. It provides
+shortcuts to create, remove, switch between, and run commands against virtual
+environments created against various Python interpreters.
+
 
 In Action
 =========
