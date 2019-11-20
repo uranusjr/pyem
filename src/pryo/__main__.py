@@ -1,4 +1,4 @@
-from .commands import dispatch
+from .cmds import dispatch
 
 
 if __name__ == "__main__":
