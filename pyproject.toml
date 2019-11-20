@@ -1,0 +1,20 @@
+[build-system]
+requires = ["flit_core >=2,<3"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+author = "Tzu-ping Chung"
+author-email = "uranusjr@gmail.com"
+description-file = "README.rst"
+
+home-page = "https://github.com/uranusjr/pryo"
+license = "ISC"
+
+module = "pryo"
+requires = [
+    "virtenv >=0.3.1",
+]
+
+[tool.black]
+line-length = 79
+target_version = ['py36']
