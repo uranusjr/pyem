@@ -14,7 +14,7 @@ import subprocess
 import sys
 import typing
 
-import virtenv
+from . import _virtenv
 
 
 class PyUnavailable(Exception):
@@ -109,6 +109,6 @@ def get_interpreter_quintuplet(python: os.PathLike) -> str:
 
 
 def create_venv(python, env_dir, prompt):
-    virtenv.create(
+    _virtenv.create(
         python=python, env_dir=env_dir, system=False, prompt=prompt, bare=False
     )

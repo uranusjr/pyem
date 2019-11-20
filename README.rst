@@ -48,7 +48,7 @@ Run a command inside a virtual environment::
     $ pryo poetry run python -c "import sys; print(sys.executable)"
     /tmp/exampleproject/.venvs/bin/python
 
-    $ pryo --with=pypy-3.6 pipenv run pypy3 -c "import sys; print(sys.executable)"
+    $ pryo --spec=pypy-3.6 pipenv run pypy3 -c "import sys; print(sys.executable)"
     /tmp/exampleproject/.venvs/bin/pypy3
 
 

@@ -12,8 +12,11 @@ license = "ISC"
 
 module = "pryo"
 requires = [
-    "virtenv >=0.3.1",
+    "virtualenv >=16.7.7",
 ]
+
+[tool.flit.scripts]
+pryo = "pryo:main"
 
 [tool.black]
 line-length = 79
