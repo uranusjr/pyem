@@ -54,15 +54,15 @@ def _parse_for_venv(argv: _ArgList) -> _Options:
 
     parser_rm = subparsers.add_parser("remove", usage="remove venv")
     parser_rm.add_argument("spec", help="venv specifier")
-    parser_add.set_defaults(func=venvs.remove)
+    parser_rm.set_defaults(func=venvs.remove)
 
     parser_set = subparsers.add_parser("set", usage="set default venv")
     parser_set.add_argument("spec", help="venv specifier")
-    parser_add.set_defaults(func=venvs.activate)
+    parser_set.set_defaults(func=venvs.activate)
 
     parser_list = subparsers.add_parser("list", usage="list available venvs")
     parser_list.add_argument("--format", choices=["table"])
-    parser_add.set_defaults(func=venvs.show_all)
+    parser_list.set_defaults(func=venvs.show_all)
 
     return parser.parse_args(argv)
 

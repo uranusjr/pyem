@@ -32,6 +32,10 @@ _VENV_CONTAINER_NAME = ".venvs"
 _VENV_MARKER_NAME = ".venv"
 
 
+def _paths(*entries):
+    return os.pathsep.join(str(e) for e in entries)
+
+
 @dataclasses.dataclass()
 class _VirtualEnvironmentInvalid(Exception):
     root: pathlib.Path
@@ -44,15 +48,17 @@ class _VirtualEnvironment:
     def exists(self) -> bool:
         return self.root.is_dir()
 
+    def which(self, name: str) -> typing.Optional[str]:
+        path = _paths(self.root.joinpath("bin"), self.root.joinpath("Scripts"))
+        return shutil.which(name, path=path)
+
     @property
     def name(self) -> str:
         return self.root.name
 
     @property
     def python(self) -> pathlib.Path:
-        r = self.root
-        path = f"{r.joinpath('bin')}{os.pathsep}{r.joinpath('Scripts')}"
-        python = shutil.which("python", path=path)
+        python = self.which("python")
         if python is None:
             raise _VirtualEnvironmentInvalid(self.root)
         return python
@@ -68,6 +74,18 @@ class _VirtualEnvironment:
                 if path.is_dir():
                     return path
         raise _VirtualEnvironmentInvalid(self.root)
+
+    def derive_environ(self, base=None):
+        if base is None:
+            base = os.environ
+        environ = base.copy()
+        environ["PATH"] = _paths(
+            self.root.joinpath("bin"),
+            self.root.joinpath("Scripts"),
+            environ["PATH"],
+        )
+        environ["VIRTUAL_ENV"] = str(self.root)
+        return environ
 
 
 Runtime = _VirtualEnvironment
