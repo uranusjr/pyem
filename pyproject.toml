@@ -11,10 +11,7 @@ home-page = "https://github.com/uranusjr/pyem"
 license = "ISC"
 
 module = "pyem"
-requires = [
-    "shellingham",
-    "virtualenv",
-]
+requires = []
 
 [tool.flit.scripts]
 pyem = "pyem:main"

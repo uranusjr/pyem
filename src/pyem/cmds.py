@@ -3,17 +3,23 @@ __all__ = ["dispatch"]
 
 import argparse
 import functools
+import logging
 import sys
 import typing
 
 from . import procs, venvs
-from .projects import Project
+from ._logging import configure_logging
+from .errs import Error
+from .projects import Project, ProjectNotFound
 
 
 _ArgIter = typing.Iterator[str]
 _ArgList = typing.List[str]
 
 _Options = typing.Any
+
+
+logger = logging.getLogger(__name__)
 
 
 def _iter_until_subcommand(iterator: _ArgIter) -> _ArgIter:
@@ -89,8 +95,16 @@ def _parse_args(argv: _ArgList) -> _Options:
 
 
 def dispatch(argv: typing.Optional[_ArgList]) -> int:
+    configure_logging(logging.INFO)  # TODO: Make this configurable.
+
     if argv is None:
         argv = sys.argv
-    project = Project.discover()
+
+    try:
+        project = Project.discover()
+    except ProjectNotFound:
+        logger.error("No pyproject.toml found")
+        return Error.project_not_found
+
     opts = _parse_args(argv)
     return opts.func(project, opts)

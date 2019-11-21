@@ -2,10 +2,12 @@ __all__ = [
     # Exceptions.
     "FailedToRemove",
     "InterpreterNotFound",
-    "MultipleRuntimes",
-    "NoRuntimes",
+    "MultipleRuntimeMatches",
+    "NoRuntimeMatch",
     "PyUnavailable",
+    "RuntimeInvalid",
     "RuntimeExists",
+    "VirtualenvNotFound",
     # Functionalities.
     "ProjectRuntimeManagementMixin",
     "Runtime",
@@ -18,13 +20,14 @@ import shutil
 import typing
 
 from .base import BaseProject
-from ._envs import (
+from .envs import (
     PyUnavailable,
     create_venv,
     get_interpreter_quintuplet,
     looks_like_path,
     resolve_python,
 )
+from ._virtenv import VirtualenvNotFound
 
 
 _VENV_CONTAINER_NAME = ".venvs"
@@ -98,6 +101,7 @@ class _VirtualEnvironment:
 
 
 Runtime = _VirtualEnvironment
+RuntimeInvalid = _VirtualEnvironmentInvalid
 
 
 @dataclasses.dataclass()
@@ -166,13 +170,13 @@ class _QuintapletMatcher:
 
 
 @dataclasses.dataclass()
-class NoRuntimes(Exception):
+class NoRuntimeMatch(Exception):
     alias: str
     tried: typing.List[Runtime]
 
 
 @dataclasses.dataclass()
-class MultipleRuntimes(Exception):
+class MultipleRuntimeMatches(Exception):
     alias: str
     matches: typing.List[Runtime]
 
@@ -238,22 +242,22 @@ class ProjectRuntimeManagementMixin(BaseProject):
         * Full identifier + hash (`cpython-3.7-darwin-x86_64-3d3725a6`)
         * Path to a Python interpreter
 
-        The retuend runtime is guarenteed to exist. Raises `NoRuntimes` if
-        no match is found, `MultipleRuntimes` if the alias is ambiguous.
+        The retuend runtime is guarenteed to exist. Raises `NoRuntimeMatch` if
+        no match is found, `MultipleRuntimeMatches` if the alias is ambiguous.
         """
         try:
             matcher = _QuintapletMatcher.from_alias(alias)
         except ValueError:
-            raise NoRuntimes(alias, list(self.iter_runtimes()))
+            raise NoRuntimeMatch(alias, list(self.iter_runtimes()))
         matches = [
             runtime
             for runtime in self.iter_runtimes()
             if matcher.match(runtime)
         ]
         if not matches:
-            raise NoRuntimes(alias, list(self.iter_runtimes()))
+            raise NoRuntimeMatch(alias, list(self.iter_runtimes()))
         if len(matches) > 1:
-            raise MultipleRuntimes(alias, matches)
+            raise MultipleRuntimeMatches(alias, matches)
         return matches[0]
 
     def activate_runtime(self, runtime: Runtime):
@@ -266,8 +270,6 @@ class ProjectRuntimeManagementMixin(BaseProject):
         See: https://github.com/pypa/pipenv/issues/2680
         """
         marker = self._runtime_marker
-        if marker.exists() and not marker.is_file():
-            raise PermissionError(f"Not a file: {repr(str(marker))}")
         with marker.open("w", newline="\n", encoding="utf8") as f:
             f.write(f"{_VENV_CONTAINER_NAME}/{runtime.name}")
 

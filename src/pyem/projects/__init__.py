@@ -1,20 +1,10 @@
-__all__ = [
-    "MultipleRuntimes",
-    "NoRuntimes",
-    "Project",
-    "ProjectNotFound",
-    "Runtime",
-]
+__all__ = ["Project", "ProjectNotFound", "Runtime", "looks_like_path"]
 
 import pathlib
 
 from .base import BaseProject
-from .runtimes import (
-    MultipleRuntimes,
-    NoRuntimes,
-    ProjectRuntimeManagementMixin,
-    Runtime,
-)
+from .envs import looks_like_path
+from .runtimes import ProjectRuntimeManagementMixin, Runtime
 
 
 class ProjectNotFound(Exception):
