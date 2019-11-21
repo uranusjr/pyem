@@ -18,6 +18,14 @@ Add a virtual environment::
 
     $ pyem venv add /usr/local/bin/pypy3  # Based on an executable.
 
+The second variant relies on the `Python launcher`_ to locate an interpreter.
+This tool should be installed by default if you use the officlal installer on
+Windows (and do not explicitly choose not to install it). For other platforms,
+`Python launcher for UNIX`_ by Brett Cannon can be used as an alternative.
+
+.. _`Python launcher`: https://docs.python.org/3/using/windows.html#launcher
+.. _`Python launcher for UNIX`: https://github.com/brettcannon/python-launcher
+
 
 List managed virtual environments::
 
@@ -60,7 +68,6 @@ control to ``subprocess`` for the command specified. This is enough to trick
 a lot of Python project tools, including the `Python launcher`_, Poetry_, and
 Pipenv_.
 
-.. _`Python launcher`: https://www.python.org/dev/peps/pep-0397/
 .. _Poetry: https://poetry.eustace.io
 .. _Pipenv: https://github.com/pypa/pipenv
 
