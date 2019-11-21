@@ -65,8 +65,9 @@ How does this work?
 
 PyEM sets environment variables ``VIRTUAL_ENV`` and ``PATH``, and hand off
 control to ``subprocess`` for the command specified. This is enough to trick
-a lot of Python project tools, including the `Python launcher`_, Poetry_, and
-Pipenv_.
+a lot of Python project tools, including `Python launcher`_, Poetry_, and
+Pipenv_. Python interpreters with ``venv`` support (e.g. CPython 3.3 or later)
+should also integrate seamlessly.
 
 .. _Poetry: https://poetry.eustace.io
 .. _Pipenv: https://github.com/pypa/pipenv
