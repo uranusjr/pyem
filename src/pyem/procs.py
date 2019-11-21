@@ -1,5 +1,6 @@
 __all__ = ["run"]
 
+import os
 import subprocess
 
 
@@ -8,5 +9,9 @@ def run(project, options):
         runtime = project.find_runtime(options.spec)
     else:
         runtime = project.get_active_runtime()
-    args = [options.cmd, *options.args]
-    subprocess.run(args, env=runtime.derive_environ(), check=True)
+
+    env = os.environ.copy()
+    env["PATH"] = runtime.derive_environ_path()
+    env["VIRTUAL_ENV"] = str(runtime.root)
+
+    subprocess.run([options.cmd, *options.args], env=env, check=True)

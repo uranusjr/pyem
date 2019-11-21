@@ -12,6 +12,7 @@ license = "ISC"
 
 module = "pyem"
 requires = [
+    "shellingham",
     "virtualenv",
 ]
 

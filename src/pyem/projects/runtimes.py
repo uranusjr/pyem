@@ -32,10 +32,6 @@ _VENV_CONTAINER_NAME = ".venvs"
 _VENV_MARKER_NAME = ".venv"
 
 
-def _paths(*entries):
-    return os.pathsep.join(str(e) for e in entries)
-
-
 @dataclasses.dataclass()
 class _VirtualEnvironmentInvalid(Exception):
     root: pathlib.Path
@@ -48,17 +44,45 @@ class _VirtualEnvironment:
     def exists(self) -> bool:
         return self.root.is_dir()
 
+    @typing.overload
+    def derive_environ_path(self) -> str:
+        ...
+
+    @typing.overload
+    def derive_environ_path(self, *, path: str) -> str:
+        ...
+
+    def derive_environ_path(self, *, path=None) -> str:
+        """Derive this virtual environment's supposed PATH environ.
+
+        If `base` is not passed), all entries in the virtual environment and
+        the default PATH are searched.
+
+        If `base` is given, it should be a string to override the environment's
+        default PATH. This is useful if you don't want to search in the global
+        (non-venv) PATH -- pass in an empty string so the command is only
+        searched in the virtual environment.
+        """
+        if path is None:
+            path = os.environ.get("PATH", "")
+        paths = [
+            str(self.root.joinpath("bin")),
+            str(self.root.joinpath("Scripts"))
+        ]
+        if path:
+            paths.append(path)
+        return os.pathsep.join(paths)
+
     @property
     def name(self) -> str:
         return self.root.name
 
     @property
     def python(self) -> pathlib.Path:
-        path = _paths(self.root.joinpath("bin"), self.root.joinpath("Scripts"))
-        python = shutil.which("python", path=path)
+        python = shutil.which("python", path=self.derive_environ_path(path=""))
         if python is None:
             raise _VirtualEnvironmentInvalid(self.root)
-        return python
+        return pathlib.Path(python)
 
     @property
     def site_packages(self) -> pathlib.Path:
@@ -71,18 +95,6 @@ class _VirtualEnvironment:
                 if path.is_dir():
                     return path
         raise _VirtualEnvironmentInvalid(self.root)
-
-    def derive_environ(self, base=None):
-        if base is None:
-            base = os.environ
-        environ = base.copy()
-        environ["PATH"] = _paths(
-            self.root.joinpath("bin"),
-            self.root.joinpath("Scripts"),
-            environ["PATH"],
-        )
-        environ["VIRTUAL_ENV"] = str(self.root)
-        return environ
 
 
 Runtime = _VirtualEnvironment

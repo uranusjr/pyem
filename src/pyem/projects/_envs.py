@@ -36,7 +36,7 @@ def _find_python_with_py(python: str) -> typing.Optional[pathlib.Path]:
     if not py:
         raise PyUnavailable()
     code = "import sys; print(sys.executable)"
-    out = _get_command_output([str(py), f"-{python}", "-c", code])
+    out = _get_command_output([py, f"-{python}", "-c", code])
     if not out:
         return None
     return pathlib.Path(out)
@@ -58,7 +58,10 @@ def resolve_python(python: str) -> typing.Optional[pathlib.Path]:
         return _find_python_with_py(python)
     if looks_like_path(python):
         return pathlib.Path(python)
-    return shutil.which(python)
+    resolved = shutil.which(python)
+    if not resolved:
+        return None
+    return pathlib.Path(resolved)
 
 
 # The prefix part is adopted from Virtualenv's approach. This allows us to find
