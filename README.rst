@@ -55,7 +55,7 @@ Run a command inside a virtual environment::
 How does this work?
 ===================
 
-Pryo sets environment variables ``VIRTUAL_ENV`` and ``PATH``, and hand off
+PyEM sets environment variables ``VIRTUAL_ENV`` and ``PATH``, and hand off
 control to ``subprocess`` for the command specified. This is enough to trick
 a lot of Python project tools, including the `Python launcher`_, Poetry_, and
 Pipenv_.
