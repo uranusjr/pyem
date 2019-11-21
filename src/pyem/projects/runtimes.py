@@ -67,7 +67,7 @@ class _VirtualEnvironment:
             path = os.environ.get("PATH", "")
         paths = [
             str(self.root.joinpath("bin")),
-            str(self.root.joinpath("Scripts"))
+            str(self.root.joinpath("Scripts")),
         ]
         if path:
             paths.append(path)

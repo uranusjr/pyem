@@ -4,7 +4,7 @@
 __version__ = "0.1.1"
 
 
-def main():
+def main() -> int:
     from .cmds import dispatch
 
     return dispatch(None)

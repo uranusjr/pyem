@@ -88,7 +88,7 @@ def _parse_args(argv: _ArgList) -> _Options:
     return _parse_for_bridge(before_cmd, cmd, after_cmd)
 
 
-def dispatch(argv: typing.Optional[_ArgList]):
+def dispatch(argv: typing.Optional[_ArgList]) -> int:
     if argv is None:
         argv = sys.argv
     project = Project.discover()

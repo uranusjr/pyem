@@ -5,24 +5,27 @@ def _find_runtime_match(project, alias: str):
     return project.find_runtime(alias)
 
 
-def add(project, options):
+def add(project, options) -> int:
     runtime = project.create_runtime(options.python)
     print("created", runtime.name)
+    return 0
 
 
-def remove(project, options):
+def remove(project, options) -> int:
     runtime = _find_runtime_match(project, options.spec)
     project.remove_runtime(runtime)
     print("removed", runtime.name)
+    return 0
 
 
-def activate(project, options):
+def activate(project, options) -> int:
     runtime = _find_runtime_match(project, options.spec)
     project.activate_runtime(runtime)
     print("activated", runtime.name)
+    return 0
 
 
-def show_all(project, options):
+def show_all(project, options) -> int:
     print("  Quintuplet")
     print("=" * 45)
 
@@ -32,3 +35,5 @@ def show_all(project, options):
             "*" if runtime == active_runtime else " ", runtime.name
         )
         print(line)
+
+    return 0
