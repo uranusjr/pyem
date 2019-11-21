@@ -1,13 +1,7 @@
 __all__ = ["activate", "add", "remove", "show_all"]
 
-import typing
 
-from .projects import Project, Runtime
-
-
-def _find_runtime_match(
-    project: Project, alias: str
-) -> typing.Optional[Runtime]:
+def _find_runtime_match(project, alias: str):
     return project.find_runtime(alias)
 
 
