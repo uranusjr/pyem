@@ -14,12 +14,9 @@ logger = logging.getLogger(__name__)
 def add(project, options) -> int:
     try:
         runtime = project.create_runtime(options.python)
-    except runtimes.VirtualenvNotFound:
-        logger.error(
-            "Requires virtualenv to create a virtual environment for %s",
-            options.python,
-        )
-        return Error.virtualenv_unavailable
+    except runtimes.InterpreterNotFound:
+        logger.error("Not a valid interpreter: %r", options.python)
+        return Error.interpreter_not_found
     except runtimes.PyUnavailable:
         if os.name == "nt":
             url = "https://docs.python.org/3/using/windows.html"
@@ -31,8 +28,28 @@ def add(project, options) -> int:
             url,
         )
         return Error.py_unavailable
+    except runtimes.VirtualenvNotFound:
+        logger.error(
+            "Requires virtualenv to create a virtual environment for %s",
+            options.python,
+        )
+        return Error.virtualenv_unavailable
 
-    logger.info("Created virtual environment %s", runtime.name)
+    try:
+        project.activate_runtime(runtime)
+    except OSError as e:
+        env_dir = runtime.root.relative_to(project.root)
+        logger.warning("Failed to activate %s\n%s", env_dir, e)
+        activated = False
+    else:
+        activated = True
+
+    if activated:
+        msg = "Created and activates virtual environment %s"
+    else:
+        msg = "Created virtual environment %s"
+    logger.info(msg, runtime.name)
+
     return 0
 
 
@@ -82,7 +99,7 @@ def activate(project, options) -> int:
         logger.error("Failed to activate %s\n%s", env_dir, e)
         return e.errno
 
-    logger.info("Activated virtual environment %s", runtime.name)
+    logger.info("Activated virtual environment: %s", runtime.name)
     return 0
 
 

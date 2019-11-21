@@ -4,12 +4,13 @@ import typing
 
 
 class Error(enum.IntEnum):
+    interpreter_not_found = enum.auto()
+    project_not_found = enum.auto()
+    py_unavailable = enum.auto()
     runtime_invalid = enum.auto()
     runtime_multiple_matches = enum.auto()
     runtime_no_active = enum.auto()
     runtime_no_match = enum.auto()
-    project_not_found = enum.auto()
-    py_unavailable = enum.auto()
     virtualenv_unavailable = enum.auto()
 
 
