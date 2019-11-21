@@ -1,8 +1,8 @@
 ==================================================
-Pryo: Project-level virtual environment management
+PyEM: Project-level virtual environment management
 ==================================================
 
-Pryo manages multiple virtual environments local to projects. It provides
+PyEM manages multiple virtual environments local to projects. It provides
 shortcuts to create, remove, switch between, and run commands against virtual
 environments created against various Python interpreters.
 
@@ -12,16 +12,16 @@ In Action
 
 Add a virtual environment::
 
-    $ pryo venv add python3.7  # Based on a command.
+    $ pyem venv add python3.7  # Based on a command.
 
-    $ pryo venv add 3.6  # Based on interpreter found by the Python launcher.
+    $ pyem venv add 3.6  # Based on interpreter found by the Python launcher.
 
-    $ pryo venv add /usr/local/bin/pypy3  # Based on an executable.
+    $ pyem venv add /usr/local/bin/pypy3  # Based on an executable.
 
 
 List managed virtual environments::
 
-    $ pryo venv list
+    $ pyem venv list
       Quintuplet
     =============================================
       cpython-3.6-darwin-x86_64-f14a3513
@@ -31,24 +31,24 @@ List managed virtual environments::
 
 Set active virtual environment::
 
-    $ pryo venv set 3.7
+    $ pyem venv set 3.7
     Switched to cpython-3.7-darwin-x86_64-dbe83ac5
 
-    $ pryo venv set 3.6
+    $ pyem venv set 3.6
     Error: name '3.6' is ambiguous; choose from:
       cpython-3.6-darwin-x86_64-f14a3513
       pypy-3.6-darwin-x86_64-dc1298a1
 
-    $ pryo venv set cpython-3.6
+    $ pyem venv set cpython-3.6
     Switched to cpython-3.6-darwin-x86_64-f14a3513
 
 
 Run a command inside a virtual environment::
 
-    $ pryo poetry run python -c "import sys; print(sys.executable)"
+    $ pyem poetry run python -c "import sys; print(sys.executable)"
     /tmp/exampleproject/.venvs/bin/python
 
-    $ pryo --spec=pypy-3.6 pipenv run pypy3 -c "import sys; print(sys.executable)"
+    $ pyem --spec=pypy-3.6 pipenv run pypy3 -c "import sys; print(sys.executable)"
     /tmp/exampleproject/.venvs/bin/pypy3
 
 
@@ -67,4 +67,4 @@ Pipenv_.
 Flit is more difficult to trick since it does not automatically inspect
 environment variables like other tools do. Use this workaround instead::
 
-    $ pryo flit install --python=python
+    $ pyem flit install --python=python

@@ -7,16 +7,16 @@ author = "Tzu-ping Chung"
 author-email = "uranusjr@gmail.com"
 description-file = "README.rst"
 
-home-page = "https://github.com/uranusjr/pryo"
+home-page = "https://github.com/uranusjr/pyem"
 license = "ISC"
 
-module = "pryo"
+module = "pyem"
 requires = [
     "virtualenv",
 ]
 
 [tool.flit.scripts]
-pryo = "pryo:main"
+pyem = "pyem:main"
 
 [tool.black]
 line-length = 79
