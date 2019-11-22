@@ -45,7 +45,7 @@ def add(project, options) -> int:
         activated = True
 
     if activated:
-        msg = "Created and activates virtual environment %s"
+        msg = "Created and activated virtual environment %s"
     else:
         msg = "Created virtual environment %s"
     logger.info(msg, runtime.name)
