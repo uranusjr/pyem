@@ -111,7 +111,11 @@ def get_interpreter_quintuplet(python: os.PathLike) -> str:
     return _get_command_output([str(python), "-c", _VENV_NAME_CODE])
 
 
-def create_venv(python, env_dir, prompt):
+def create_venv(python: os.PathLike, env_dir: pathlib.Path, prompt: str):
     _virtenv.create(
-        python=python, env_dir=env_dir, system=False, prompt=prompt, bare=False
+        python=str(python),
+        env_dir=env_dir,
+        system=False,
+        prompt=prompt,
+        bare=False,
     )
