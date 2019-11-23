@@ -42,10 +42,13 @@ class _VirtualEnvironmentInvalid(Exception):
 
 @dataclasses.dataclass()
 class _VirtualEnvironment:
-    root: pathlib.Path
+    """Represents a virtual environment.
 
-    def exists(self) -> bool:
-        return self.root.is_dir()
+    The root MUST be a directory (or a symlink to a directory). For now this
+    does not ensure the environment is working though; maybe we should.
+    """
+
+    root: pathlib.Path
 
     @typing.overload
     def derive_environ_path(self) -> str:
@@ -199,19 +202,13 @@ class ProjectRuntimeManagementMixin(BaseProject):
     def _runtime_container(self) -> pathlib.Path:
         return self.root.joinpath(_VENV_CONTAINER_NAME)
 
-    def _get_runtime(self, name: str) -> Runtime:
-        """Get a runtime with name.
-
-        This does not check whether the runtime actually exists.
-        """
-        return Runtime(self._runtime_container.joinpath(name))
-
     def iter_runtimes(self) -> typing.Iterator[Runtime]:
         if not self._runtime_container.is_dir():
             return
         for entry in self._runtime_container.iterdir():
             if not entry.is_dir():
                 continue
+            # TODO: Should be only list valid runtimes with quintuplet name?
             yield Runtime(entry)
 
     def create_runtime(self, interpreter_spec: str) -> Runtime:
@@ -221,14 +218,15 @@ class ProjectRuntimeManagementMixin(BaseProject):
         if not python:
             raise InterpreterNotFound(interpreter_spec)
 
-        runtime = self._get_runtime(get_interpreter_quintuplet(python))
-        if runtime.exists():
-            raise RuntimeExists(runtime)
+        env_name = get_interpreter_quintuplet(python)
+        env_dir = self._runtime_container.joinpath(env_name)
+        if env_dir.exists():
+            raise RuntimeExists(Runtime(env_dir))
 
         # TODO: Make prompt configurable? Include quintuplet in prompt?
-        create_venv(python=python, env_dir=runtime.root, prompt=self.name)
+        create_venv(python=python, env_dir=env_dir, prompt=self.name)
 
-        return runtime
+        return Runtime(env_dir)
 
     def find_runtime(self, alias: str) -> Runtime:
         """Choose exactly one matching runtime from an alias.
@@ -245,6 +243,7 @@ class ProjectRuntimeManagementMixin(BaseProject):
         The retuend runtime is guarenteed to exist. Raises `NoRuntimeMatch` if
         no match is found, `MultipleRuntimeMatches` if the alias is ambiguous.
         """
+        # TODO: Should we check the runtime to return is valid?
         try:
             matcher = _QuintapletMatcher.from_alias(alias)
         except ValueError:
@@ -283,11 +282,10 @@ class ProjectRuntimeManagementMixin(BaseProject):
             prefix, name = content.split("/", 1)
             if prefix != _VENV_CONTAINER_NAME:
                 return None
-            # TODO: Check the name is a valid quintuplet.
-            runtime = self._get_runtime(name)
-            if not runtime.exists():
+            path = self._runtime_container.joinpath(name)
+            if not path.exists():
                 return None
-            return runtime
+            return Runtime(path)
 
         # Compatibility case: .venv is a link to a dir in `{root}/.venvs`.
         # Use that if it's managed.
@@ -297,7 +295,6 @@ class ProjectRuntimeManagementMixin(BaseProject):
             path = self._runtime_marker.resolve()
             if self._runtime_container not in path.parents:
                 return None
-            # TODO: Check the name is a valid quintuplet.
             return Runtime(path)
 
         return None
@@ -306,5 +303,7 @@ class ProjectRuntimeManagementMixin(BaseProject):
         # Deactivate env if it is going to be removed.
         if self.get_active_runtime() == runtime:
             self._runtime_marker.unlink()
-        if runtime.exists():
+        if runtime.root.is_symlink():
+            runtime.root.unlink()
+        else:
             shutil.rmtree(runtime.root)

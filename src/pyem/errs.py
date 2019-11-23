@@ -34,6 +34,7 @@ def errorlog(etype: typing.Type[_Exc], hndl: _ExcHandler[_Exc]) -> _ExcLogger:
     message and a proper error code, similar to how a web server converts an
     exception into a 500 response.
     """
+
     def decorator(f: _ExcLogged) -> _ExcLogged:
         @functools.wraps(f)
         def wrapped(*args, **kwargs) -> int:
