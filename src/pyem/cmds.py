@@ -37,15 +37,21 @@ def _partition_argv(argv: _ArgList) -> typing.Tuple[_ArgList, str, _ArgList]:
     return before_cmd, cmd, list(argv_iterator)
 
 
-def _handle_missing(parser, project, options):
-    parser.print_help()
+_MISSING_PARSER_EPILOG = (
+    "A special command `venv` can be used to configure virtual environments. "
+    "Run `pyem venv --help` for details."
+)
 
 
 def _parse_missing(argv: _ArgList) -> _Options:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(epilog=_MISSING_PARSER_EPILOG)
     parser.add_argument("cmd", help="command to run")
     parser.add_argument("arg", nargs="*", help="command argument")
     return parser.parse_args(argv)
+
+
+def _handle_missing(parser, project, options):
+    parser.print_help()
 
 
 def _parse_for_venv(argv: _ArgList) -> _Options:
@@ -54,19 +60,27 @@ def _parse_for_venv(argv: _ArgList) -> _Options:
 
     subparsers = parser.add_subparsers()
 
-    parser_add = subparsers.add_parser("add", usage="create venv")
+    parser_add = subparsers.add_parser(
+        "add", description="Create a virtual environment for this project."
+    )
     parser_add.add_argument("python", help="base interpreter to use")
     parser_add.set_defaults(func=venvs.add)
 
-    parser_rm = subparsers.add_parser("remove", usage="remove venv")
+    parser_rm = subparsers.add_parser(
+        "remove", description="Remove a virtual environment from this project."
+    )
     parser_rm.add_argument("spec", help="venv specifier")
     parser_rm.set_defaults(func=venvs.remove)
 
-    parser_set = subparsers.add_parser("set", usage="set default venv")
+    parser_set = subparsers.add_parser(
+        "set", description="Set the project's default virtual environment."
+    )
     parser_set.add_argument("spec", help="venv specifier")
     parser_set.set_defaults(func=venvs.activate)
 
-    parser_list = subparsers.add_parser("list", usage="list available venvs")
+    parser_list = subparsers.add_parser(
+        "list", description="List virtual environments in this project."
+    )
     parser_list.add_argument("--format", choices=["table"])
     parser_list.set_defaults(func=venvs.show_all)
 

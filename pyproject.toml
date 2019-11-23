@@ -18,4 +18,5 @@ pyem = "pyem:main"
 
 [tool.black]
 line-length = 79
-target_version = ['py36']
+target_version = ["py36"]
+include = '^/src/.+\.py$'
