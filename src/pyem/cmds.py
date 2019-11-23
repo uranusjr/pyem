@@ -1,6 +1,5 @@
 __all__ = ["dispatch"]
 
-
 import argparse
 import functools
 import logging
@@ -43,8 +42,26 @@ _MISSING_PARSER_EPILOG = (
 )
 
 
+class PyEMArgumentParser(argparse.ArgumentParser):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.add_argument(
+            "--project",
+            help="alternative path marking the project root",
+            metavar="PATH",
+            default=None,
+        )
+
+    def add_subparsers(self, **kwargs):
+        # Revert to the basic parser class to avoid root arguments from being
+        # defined in subparsers.
+        if "parser_class" not in kwargs:
+            kwargs["parser_class"] = argparse.ArgumentParser
+        return super().add_subparsers(**kwargs)
+
+
 def _parse_missing(argv: _ArgList) -> _Options:
-    parser = argparse.ArgumentParser(epilog=_MISSING_PARSER_EPILOG)
+    parser = PyEMArgumentParser(epilog=_MISSING_PARSER_EPILOG)
     parser.add_argument("cmd", help="command to run")
     parser.add_argument("arg", nargs="*", help="command argument")
     return parser.parse_args(argv)
@@ -55,7 +72,7 @@ def _handle_missing(parser, project, options):
 
 
 def _parse_for_venv(argv: _ArgList) -> _Options:
-    parser = argparse.ArgumentParser()
+    parser = PyEMArgumentParser()
     parser.set_defaults(func=functools.partial(_handle_missing, parser))
 
     subparsers = parser.add_subparsers()
@@ -88,7 +105,7 @@ def _parse_for_venv(argv: _ArgList) -> _Options:
 
 
 def _parse_for_bridge(flags: _ArgList, cmd: str, args: _ArgList) -> _Options:
-    parser = argparse.ArgumentParser()
+    parser = PyEMArgumentParser()
     parser.add_argument("--spec", help="venv context to use", default=None)
 
     options = parser.parse_args(flags)
@@ -114,11 +131,17 @@ def dispatch(argv: typing.Optional[_ArgList]) -> int:
     if argv is None:
         argv = sys.argv
 
+    opts = _parse_args(argv)
+
+    # If we specify an explicit path, we only want to search the specified
+    # directory (or the directory containing the specified file), i.e. up 0
+    # times. Otherwise we search indefinitely (up=None).
+    up = 0 if opts.project else None
+
     try:
-        project = Project.discover()
-    except ProjectNotFound:
-        logger.error("No pyproject.toml found")
+        project = Project.discover(opts.project, up=up)
+    except ProjectNotFound as e:
+        logger.error("No pyproject.toml found in %s", e.start)
         return Error.project_not_found
 
-    opts = _parse_args(argv)
     return opts.func(project, opts)
