@@ -72,11 +72,13 @@ should also integrate seamlessly.
 .. _Poetry: https://poetry.eustace.io
 .. _Pipenv: https://github.com/pypa/pipenv
 
-Flit is more difficult to trick since it does not automatically inspect
+Flit_ is more difficult to trick since it does not automatically inspect
 environment variables like other tools do. Use this workaround instead
 (requires the Python launcher)::
 
     $ pyem flit install --python=py
+
+.. _Flit: https://github.com/takluyver/flit
 
 Starting from Flit 2.1, you can also set the environment variable
 ``FLIT_INSTALL_PYTHON=py`` for the same effect. This is a good default even
