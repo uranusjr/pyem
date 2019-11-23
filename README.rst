@@ -65,7 +65,7 @@ How does this work?
 
 PyEM sets environment variables ``VIRTUAL_ENV`` and ``PATH``, and hand off
 control to ``subprocess`` for the command specified. This is enough to trick
-a lot of Python project tools, including `Python launcher`_, Poetry_, and
+a lot of Python project tools, including the Python launcher, Poetry_, and
 Pipenv_. Python interpreters with ``venv`` support (e.g. CPython 3.3 or later)
 should also integrate seamlessly.
 
@@ -73,6 +73,7 @@ should also integrate seamlessly.
 .. _Pipenv: https://github.com/pypa/pipenv
 
 Flit is more difficult to trick since it does not automatically inspect
-environment variables like other tools do. Use this workaround instead::
+environment variables like other tools do. Use this workaround instead
+(requires the Python launcher)::
 
-    $ pyem flit install --python=python
+    $ pyem flit install --python=py
