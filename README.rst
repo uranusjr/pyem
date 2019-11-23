@@ -77,3 +77,8 @@ environment variables like other tools do. Use this workaround instead
 (requires the Python launcher)::
 
     $ pyem flit install --python=py
+
+Starting from Flit 2.1, you can also set the environment variable
+``FLIT_INSTALL_PYTHON=py`` for the same effect. This is a good default even
+when you're not using PyEM IMO; it makes more sense than installing into Flit's
+environment.
