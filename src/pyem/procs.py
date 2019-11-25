@@ -19,7 +19,7 @@ class _NoActiveRuntime(Exception):
     pass
 
 
-def _find_runtime(project, options):
+def _find_runtime(project: Project, options) -> runtimes.Runtime:
     if options.spec:
         return project.find_runtime(options.spec)
     runtime = project.get_active_runtime()
