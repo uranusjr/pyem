@@ -114,7 +114,7 @@ def activate(project, options) -> int:
 def show_active(project, options) -> int:
     runtime = project.get_active_runtime()
     if not runtime:
-        print("No active runtime.")
+        logger.error("No active runtime.")
         return Error.runtime_no_active
     print(runtime.name)
     return 0
