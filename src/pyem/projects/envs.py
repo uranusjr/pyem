@@ -28,7 +28,16 @@ def _get_command_output(*args, **kwargs) -> str:
     return out
 
 
-_PY_VER_RE = re.compile(r"^(?P<major>\d+)(:?\.(?P<minor>\d+))?")
+_PY_VER_RE = re.compile(
+    r"""
+    ^
+    (\d+)           # Major.
+    (:?\.(\d+))?    # Minor.
+    (:?\-(32|64))?  # Either -32 or -64.
+    $
+    """,
+    re.VERBOSE,
+)
 
 
 def _find_python_with_py(python: str) -> typing.Optional[pathlib.Path]:

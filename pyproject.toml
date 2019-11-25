@@ -11,12 +11,18 @@ home-page = "https://github.com/uranusjr/pyem"
 license = "ISC"
 
 module = "pyem"
+requires-python = ">=3.7"
 requires = []
+
+[tool.flit.metadata.requires-extra]
+test = [
+    "pytest",
+]
 
 [tool.flit.scripts]
 pyem = "pyem:main"
 
 [tool.black]
 line-length = 79
-target_version = ["py36"]
-include = '^/src/.+\.py$'
+target_version = ["py37"]
+include = '^/(src|tests)/.+\.py$'
