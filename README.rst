@@ -32,23 +32,23 @@ List managed virtual environments::
     $ pyem venv list
       Quintuplet
     =============================================
-      cpython-3.6-darwin-x86_64-f14a3513
-      cpython-3.7-darwin-x86_64-dbe83ac5
-    * pypy-3.6-darwin-x86_64-dc1298a1
+      cpython-3.6-darwin-fat-f14a3513
+      cpython-3.7-darwin-fat-dbe83ac5
+    * pypy-3.6-darwin-fat-dc1298a1
 
 
 Set active virtual environment::
 
     $ pyem venv set 3.7
-    Switched to cpython-3.7-darwin-x86_64-dbe83ac5
+    Switched to cpython-3.7-darwin-fat-dbe83ac5
 
     $ pyem venv set 3.6
     Error: name '3.6' is ambiguous; choose from:
-      cpython-3.6-darwin-x86_64-f14a3513
-      pypy-3.6-darwin-x86_64-dc1298a1
+      cpython-3.6-darwin-fat-f14a3513
+      pypy-3.6-darwin-fat-dc1298a1
 
     $ pyem venv set cpython-3.6
-    Switched to cpython-3.6-darwin-x86_64-f14a3513
+    Switched to cpython-3.6-darwin-fat-f14a3513
 
 
 Run a command inside a virtual environment::

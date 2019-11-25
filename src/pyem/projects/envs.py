@@ -22,10 +22,10 @@ class PyUnavailable(Exception):
 
 
 def _get_command_output(*args, **kwargs) -> str:
-    out = subprocess.check_output(*args, **kwargs)
-    out = out.decode(sys.stdout.encoding)
-    out = out.strip()
-    return out
+    proc = subprocess.run(*args, **kwargs, stdout=subprocess.PIPE)
+    if proc.returncode:
+        return ""
+    return proc.stdout.decode(sys.stdout.encoding).strip()
 
 
 _PY_VER_RE = re.compile(
@@ -82,6 +82,7 @@ _VENV_NAME_CODE = """
 from __future__ import print_function
 import hashlib
 import sys
+import sysconfig
 import platform
 
 try:
@@ -94,11 +95,12 @@ except AttributeError:
 
 prefix = prefix.encode(sys.getfilesystemencoding(), "ignore")
 
-print("{0}-{1[0]}.{1[1]}-{2[0]}-{2[4]}-{3}".format(
-    platform.python_implementation(),
-    sys.version_info,
-    platform.uname(),
-    hashlib.sha256(prefix).hexdigest()[:8],
+print("{impl}-{vers}-{syst}-{plat}-{hash}".format(
+    impl=platform.python_implementation(),
+    vers=sysconfig.get_python_version(),
+    syst=platform.uname().system,
+    plat=sysconfig.get_platform().split("-")[-1],
+    hash=hashlib.sha256(prefix).hexdigest()[:8],
 ).lower())
 """
 
