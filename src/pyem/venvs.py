@@ -90,6 +90,14 @@ def remove(project, options) -> int:
 @errorlog(runtimes.MultipleRuntimeMatches, _multiple_runtime_matches)
 @errorlog(runtimes.NoRuntimeMatch, _no_runtime_match)
 def activate(project, options) -> int:
+    if not options.spec:
+        try:
+            project.deactivate_runtime()
+        except OSError as e:
+            logger.error("Failed to deactivate runtime\n%s", e)
+            return e.errno
+        return 0
+
     runtime = project.find_runtime(options.spec)
 
     try:
@@ -100,6 +108,15 @@ def activate(project, options) -> int:
         return e.errno
 
     logger.info("Activated virtual environment: %s", runtime.name)
+    return 0
+
+
+def show_active(project, options) -> int:
+    runtime = project.get_active_runtime()
+    if not runtime:
+        print("No active runtime.")
+        return Error.runtime_no_active
+    print(runtime.name)
     return 0
 
 

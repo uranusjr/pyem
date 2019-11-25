@@ -272,6 +272,9 @@ class ProjectRuntimeManagementMixin(BaseProject):
         with marker.open("w", newline="\n", encoding="utf8") as f:
             f.write(f"{_VENV_CONTAINER_NAME}/{runtime.name}")
 
+    def deactivate_runtime(self):
+        self._runtime_marker.unlink()
+
     def get_active_runtime(self) -> typing.Optional[Runtime]:
         """Get the active runtime.
         """

@@ -95,6 +95,11 @@ def _parse_for_venv(argv: _ArgList) -> _Options:
     parser_set.add_argument("spec", help="venv specifier")
     parser_set.set_defaults(func=venvs.activate)
 
+    parser_show = subparsers.add_parser(
+        "show", description="Show the project's default virtual environment."
+    )
+    parser_show.set_defaults(func=venvs.show_active)
+
     parser_list = subparsers.add_parser(
         "list", description="List virtual environments in this project."
     )
