@@ -4,13 +4,14 @@ import dataclasses
 import errno
 import logging
 import os
+import pathlib
 import re
 import shutil
 import subprocess
 import typing
 
 from .errs import Error
-from .projects import Project, looks_like_path
+from .projects import Project
 from .projects.runtimes import MultipleRuntimeMatches, NoRuntimeMatch, Runtime
 
 
@@ -46,8 +47,9 @@ class _Runnable:
         self._env = env
 
     def _resolve_command(self) -> typing.Optional[str]:
-        if not looks_like_path(self._cmd):
-            return shutil.which(self._cmd, path=self._env["PATH"])
+        command = shutil.which(self._cmd, path=self._env["PATH"])
+        if command:
+            return str(pathlib.Path(command).resolve())
         if os.path.isfile(self._cmd):
             return self._cmd
         return None

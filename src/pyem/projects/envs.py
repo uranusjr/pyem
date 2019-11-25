@@ -39,7 +39,7 @@ def _find_python_with_py(python: str) -> typing.Optional[pathlib.Path]:
     out = _get_command_output([py, f"-{python}", "-c", code])
     if not out:
         return None
-    return pathlib.Path(out)
+    return pathlib.Path(out).resolve()
 
 
 def looks_like_path(v: typing.Union[pathlib.Path, str]) -> bool:
