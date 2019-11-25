@@ -88,7 +88,7 @@ class _VirtualEnvironment:
         python = shutil.which("python", path=self.derive_environ_path(path=""))
         if python is None:
             raise _VirtualEnvironmentInvalid(self.root)
-        return pathlib.Path(python)
+        return pathlib.Path(python).resolve()
 
     @property
     def site_packages(self) -> pathlib.Path:
