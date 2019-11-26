@@ -69,7 +69,7 @@ class _VirtualEnvironment:
         searched in the virtual environment.
         """
         if path is None:
-            path = os.environ.get("PATH", "")
+            path = os.environ.get("PATH")
         paths = [
             str(path)
             for path in (self.root.joinpath(n) for n in ["bin", "Scripts"])
