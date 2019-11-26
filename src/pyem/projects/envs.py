@@ -70,6 +70,7 @@ def resolve_python(python: str) -> typing.Optional[pathlib.Path]:
 # https://github.com/pypa/virtualenv/blob/16.7.7/virtualenv.py#L1419-L1426
 _VENV_NAME_CODE = """
 from __future__ import print_function
+
 import hashlib
 import sys
 import sysconfig
