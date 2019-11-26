@@ -1,5 +1,6 @@
 __all__ = [
     # Exceptions.
+    "EnvironmentCreationError",
     "FailedToRemove",
     "InterpreterNotFound",
     "MultipleRuntimeMatches",
@@ -21,6 +22,7 @@ import typing
 
 from .base import BaseProject
 from .envs import (
+    EnvironmentCreationError,
     PyUnavailable,
     create_venv,
     get_interpreter_quintuplet,

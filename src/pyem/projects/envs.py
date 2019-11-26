@@ -1,10 +1,12 @@
 __all__ = [
+    "EnvironmentCreationError",
     "PyUnavailable",
     "create_venv",
     "get_interpreter_quintuplet",
     "resolve_python",
 ]
 
+import dataclasses
 import os
 import pathlib
 import re
@@ -88,7 +90,7 @@ prefix = prefix.encode(sys.getfilesystemencoding(), "ignore")
 print("{impl}-{vers}-{syst}-{plat}-{hash}".format(
     impl=platform.python_implementation(),
     vers=sysconfig.get_python_version(),
-    syst=platform.uname().system,
+    syst=platform.uname()[0],
     plat=sysconfig.get_platform().split("-")[-1],
     hash=hashlib.sha256(prefix).hexdigest()[:8],
 ).lower())
@@ -112,11 +114,19 @@ def get_interpreter_quintuplet(python: typing.Union[str, pathlib.Path]) -> str:
     return _get_command_output([str(python), "-c", _VENV_NAME_CODE])
 
 
+@dataclasses.dataclass()
+class EnvironmentCreationError(Exception):
+    context: Exception
+
+
 def create_venv(python: os.PathLike, env_dir: pathlib.Path, prompt: str):
-    _virtenv.create(
-        python=str(python),
-        env_dir=env_dir,
-        system=False,
-        prompt=prompt,
-        bare=False,
-    )
+    try:
+        _virtenv.create(
+            python=str(python),
+            env_dir=env_dir,
+            system=False,
+            prompt=prompt,
+            bare=False,
+        )
+    except subprocess.CalledProcessError as e:
+        raise EnvironmentCreationError(e)
