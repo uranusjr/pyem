@@ -95,14 +95,19 @@ class VirtualenvNotFound(EnvironmentError):
     pass
 
 
+def _find_virtualenv_py():
+    try:
+        import virtualenv
+    except ImportError:
+        raise VirtualenvNotFound
+    else:
+        virtualenv_py = get_script(virtualenv)
+    return virtualenv_py
+
+
 def _create_virtualenv(virtualenv_py, env_dir, system, prompt, bare):
     if not virtualenv_py:
-        try:
-            import virtualenv
-        except ImportError:
-            raise VirtualenvNotFound
-        else:
-            virtualenv_py = get_script(virtualenv)
+        virtualenv_py = _find_virtualenv_py()
     if not prompt:
         prompt = os.path.basename(env_dir)
     cmd = [
@@ -163,6 +168,8 @@ def _create_with_python(python, env_dir, system, prompt, bare, virtualenv_py):
         cmd.extend(["--prompt", prompt])
     if bare:
         cmd.append("--bare")
+    if not virtualenv_py:
+        virtualenv_py = _find_virtualenv_py()
     if virtualenv_py:
         cmd.extend(["--virtualenv.py", virtualenv_py])
     subprocess.check_call(cmd)
