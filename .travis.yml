@@ -1,16 +1,23 @@
 language: python
 
-python:
-  - "3.8"
-  - "3.7"
-  - "nightly"
+cache: pip
 
 jobs:
+  include:
+    - stage: lint
+      python: "3.8"
+      install: pip install mypy black
+      script:
+        - black --check
+        - mypy src
+    - stage: test
+      python:
+        - "3.8"
+        - "3.7"
+        - "nightly"
+      install:
+        - pip install flit
+        - flit install
+      script: pytest tests
   allow_failures:
     - python: "nightly"
-
-install:
-  - pip install flit
-  - flit install
-
-script: pytest tests
