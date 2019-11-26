@@ -71,8 +71,9 @@ class _VirtualEnvironment:
         if path is None:
             path = os.environ.get("PATH", "")
         paths = [
-            str(self.root.joinpath("bin")),
-            str(self.root.joinpath("Scripts")),
+            str(path)
+            for path in (self.root.joinpath(n) for n in ["bin", "Scripts"])
+            if path.is_dir()
         ]
         if path:
             paths.append(path)
