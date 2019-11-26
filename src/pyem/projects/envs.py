@@ -2,7 +2,6 @@ __all__ = [
     "PyUnavailable",
     "create_venv",
     "get_interpreter_quintuplet",
-    "looks_like_path",
     "resolve_python",
 ]
 
@@ -32,8 +31,8 @@ _PY_VER_RE = re.compile(
     r"""
     ^
     (\d+)           # Major.
-    (:?\.(\d+))?    # Minor.
-    (:?\-(32|64))?  # Either -32 or -64.
+    (:?\.(\d+))?    # Dot + Minor.
+    (:?\-(32|64))?  # Dash + either 32 or 64.
     $
     """,
     re.VERBOSE,
@@ -51,26 +50,17 @@ def _find_python_with_py(python: str) -> typing.Optional[pathlib.Path]:
     return pathlib.Path(out).resolve()
 
 
-def looks_like_path(v: typing.Union[pathlib.Path, str]) -> bool:
-    if isinstance(v, pathlib.Path):
-        return True
-    if os.sep in v:
-        return True
-    if os.altsep and os.altsep in v:
-        return True
-    return False
-
-
 def resolve_python(python: str) -> typing.Optional[pathlib.Path]:
     match = _PY_VER_RE.match(python)
     if match:
         return _find_python_with_py(python)
-    if looks_like_path(python):
-        return pathlib.Path(python)
     resolved = shutil.which(python)
-    if not resolved:
-        return None
-    return pathlib.Path(resolved)
+    if resolved:
+        return pathlib.Path(resolved)
+    path = pathlib.Path(python)
+    if path.is_file():
+        return path
+    return None
 
 
 # The prefix part is adopted from Virtualenv's approach. This allows us to find
@@ -105,7 +95,7 @@ print("{impl}-{vers}-{syst}-{plat}-{hash}".format(
 """
 
 
-def get_interpreter_quintuplet(python: os.PathLike) -> str:
+def get_interpreter_quintuplet(python: typing.Union[str, pathlib.Path]) -> str:
     """Build a unique identifier for the interpreter to place the venv.
 
     This is done by asking the interpreter to format a string containing the

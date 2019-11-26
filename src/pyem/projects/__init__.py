@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-__all__ = ["Project", "ProjectNotFound", "Runtime", "looks_like_path"]
+__all__ = ["Project", "ProjectNotFound", "Runtime"]
 
 import dataclasses
 import itertools
 import pathlib
 
 from .base import BaseProject
-from .envs import looks_like_path
 from .runtimes import ProjectRuntimeManagementMixin, Runtime
 
 

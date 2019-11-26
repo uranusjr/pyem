@@ -24,7 +24,6 @@ from .envs import (
     PyUnavailable,
     create_venv,
     get_interpreter_quintuplet,
-    looks_like_path,
     resolve_python,
 )
 from ._virtenv import VirtualenvNotFound
@@ -117,6 +116,16 @@ class RuntimeExists(Exception):
     runtime: Runtime
 
 
+def _looks_like_path(v: str) -> bool:
+    """A string looks like a path if it contains one or more path separators.
+    """
+    if os.sep in v:
+        return True
+    if os.altsep and os.altsep in v:
+        return True
+    return False
+
+
 class _QuintapletMatcher:
     """Helper class to simplify quintaplet matching logic in `find_runtime`.
     """
@@ -146,9 +155,13 @@ class _QuintapletMatcher:
         return cls([""] + v + ["", ""])
 
     @classmethod
-    def from_alias(cls, alias):
-        if looks_like_path(alias):
+    def from_alias(cls, alias: str):
+        # Only treat the input as a path if it contains a path sep. This deals
+        # with the edge case that there is a file in cwd with the same name as
+        # the supplied alias. We prioritize resolving the alias over the file.
+        if _looks_like_path(alias) and os.path.isfile(alias):
             alias = get_interpreter_quintuplet(alias)
+
         parts = alias.split("-")
         try:
             ctor = {
