@@ -7,6 +7,21 @@ shortcuts to create, remove, switch between, and run commands against virtual
 environments created against various Python interpreters.
 
 
+Install
+=======
+
+I recommend using pipx_::
+
+  pipx install pyem --spec="pyem[compat]"
+
+The "compat" extra also installs virtualenv_ to support old Python versions
+without the builtin ``venv`` module. You can drop it if you don't need this.
+(You can always ``pipx inject`` virtualenv back if you need to.)
+
+.. _pipx: https://pipxproject.github.io/pipx/
+.. _virtualenv: https://virtualenv.pypa.io/en/stable/
+
+
 In Action
 =========
 
