@@ -21,8 +21,8 @@ class PyUnavailable(Exception):
     pass
 
 
-def _get_command_output(*args, **kwargs) -> str:
-    proc = subprocess.run(*args, **kwargs, stdout=subprocess.PIPE)
+def _get_command_output(args: typing.Sequence[str]) -> str:
+    proc = subprocess.run(args, stdout=subprocess.PIPE)
     if proc.returncode:
         return ""
     return proc.stdout.decode(sys.stdout.encoding).strip()

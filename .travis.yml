@@ -8,7 +8,7 @@ jobs:
       python: "3.8"
       install: pip install mypy black
       script:
-        - black --check
+        - black --check .
         - mypy src
     - stage: test
   allow_failures:
