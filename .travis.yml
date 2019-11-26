@@ -10,7 +10,10 @@ jobs:
       script:
         - black --check .
         - mypy src
-    - stage: test
+    - stage: packaging
+      python: "3.8"
+      install: pip install flit
+      script: flit build
   allow_failures:
     - python: "nightly"
 
