@@ -6,7 +6,7 @@ import logging
 import sys
 import typing
 
-from . import procs, venvs
+from . import __version__, procs, venvs
 from ._logging import configure_logging
 from .errs import Error
 from .projects import Project, ProjectNotFound
@@ -62,6 +62,9 @@ class PyEMArgumentParser(argparse.ArgumentParser):
 
 def _parse_missing(argv: _ArgList) -> _Options:
     parser = PyEMArgumentParser(epilog=_MISSING_PARSER_EPILOG)
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {__version__}"
+    )
     parser.add_argument("cmd", help="command to run")
     parser.add_argument("arg", nargs="*", help="command argument")
     return parser.parse_args(argv)
