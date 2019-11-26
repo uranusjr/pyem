@@ -21,10 +21,7 @@ class PyUnavailable(Exception):
 
 
 def _get_command_output(args: typing.Sequence[str]) -> str:
-    proc = subprocess.run(args, stdout=subprocess.PIPE)
-    if proc.returncode:
-        return ""
-    return proc.stdout.decode(sys.stdout.encoding).strip()
+    return subprocess.check_output(args).decode(sys.stdout.encoding).strip()
 
 
 _PY_VER_RE = re.compile(
@@ -44,15 +41,17 @@ def _find_python_with_py(python: str) -> typing.Optional[pathlib.Path]:
     if not py:
         raise PyUnavailable()
     code = "import sys; print(sys.executable)"
-    out = _get_command_output([py, f"-{python}", "-c", code])
-    if not out:
+    try:
+        output = _get_command_output([py, f"-{python}", "-c", code])
+    except subprocess.CalledProcessError:
         return None
-    return pathlib.Path(out).resolve()
+    if not output:
+        return None
+    return pathlib.Path(output).resolve()
 
 
 def resolve_python(python: str) -> typing.Optional[pathlib.Path]:
-    match = _PY_VER_RE.match(python)
-    if match:
+    if _PY_VER_RE.match(python):
         return _find_python_with_py(python)
     resolved = shutil.which(python)
     if resolved:
