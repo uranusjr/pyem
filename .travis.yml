@@ -11,13 +11,16 @@ jobs:
         - black --check
         - mypy src
     - stage: test
-      python:
-        - "3.8"
-        - "3.7"
-        - "nightly"
-      install:
-        - pip install flit
-        - flit install
-      script: pytest tests
   allow_failures:
     - python: "nightly"
+
+python:
+  - "3.8"
+  - "3.7"
+  - "nightly"
+
+install:
+  - pip install flit
+  - flit install
+
+script: pytest tests
