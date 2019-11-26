@@ -60,7 +60,7 @@ class _VirtualEnvironment:
     def derive_environ_path(self, *, path=None) -> str:
         """Derive this virtual environment's supposed PATH environ.
 
-        If `base` is not passed), all entries in the virtual environment and
+        If `base` is not passed, all entries in the virtual environment and
         the default PATH are searched.
 
         If `base` is given, it should be a string to override the environment's
