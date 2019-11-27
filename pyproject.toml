@@ -15,9 +15,8 @@ requires-python = ">=3.7"
 requires = []
 
 [tool.flit.metadata.requires-extra]
-test = [
-    "pytest",
-]
+compat = ["virtualenv"]
+test = ["pytest"]
 
 [tool.flit.scripts]
 pyem = "pyem:main"

@@ -34,6 +34,13 @@ def add(project, options) -> int:
             options.python,
         )
         return Error.virtualenv_unavailable
+    except runtimes.EnvironmentCreationError as e:
+        logger.error(
+            "Failed to create a virtual environment for %s:\n%s",
+            options.python,
+            e,
+        )
+        return Error.runtime_invalid
 
     try:
         project.activate_runtime(runtime)
