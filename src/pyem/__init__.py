@@ -1,7 +1,7 @@
 """Project-level Python virtual environment management tool.
 """
 
-__version__ = "0.4.3"
+__version__ = "0.4.4"
 
 
 def main() -> int:
