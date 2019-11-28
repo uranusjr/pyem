@@ -48,11 +48,19 @@ class _Runnable:
 
     def _resolve_command(self) -> typing.Optional[str]:
         command = shutil.which(self._cmd, path=self._env["PATH"])
-        if command:
-            return str(pathlib.Path(command).resolve())
-        if os.path.isfile(self._cmd):
-            return self._cmd
-        return None
+        if not command:
+            return None
+        path = pathlib.Path(command)
+        if not path.is_file():
+            return None
+
+        # Clean up the executable path if possible. It is important to NOT
+        # resolve symlinks here because venv relies on the symlink's location
+        # to detect venv invocation.
+        if not path.is_symlink():
+            command = str(path.resolve())
+
+        return command
 
     def run(self) -> int:
         raise NotImplementedError()
