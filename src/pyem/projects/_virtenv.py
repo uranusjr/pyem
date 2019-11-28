@@ -2,6 +2,7 @@ from __future__ import print_function
 
 __all__ = ["create", "VirtualenvNotFound"]
 
+import logging
 import os
 import subprocess
 import sys
@@ -11,6 +12,7 @@ try:
 except ImportError:
     venv = None
 else:
+    BACKPORT_PROMPT = sys.version_info < (3, 6)
 
     class _EnvBuilder(venv.EnvBuilder):
         """Custom environment builder to ensure libraries are up-to-date.
@@ -20,55 +22,21 @@ else:
         """
 
         def __init__(self, **kwargs):
-            if sys.version_info < (3, 6):
+            if BACKPORT_PROMPT:
                 self.prompt = kwargs.pop("prompt", None)
             super(_EnvBuilder, self).__init__(**kwargs)
 
         def ensure_directories(self, env_dir):
             context = super(_EnvBuilder, self).ensure_directories(env_dir)
-            if sys.version_info < (3, 6) and self.prompt is not None:
+            if BACKPORT_PROMPT and self.prompt is not None:
                 context.prompt = self.prompt
             return context
 
         def setup_python(self, context):
             super(_EnvBuilder, self).setup_python(context)
-            print("New Python executable in", context.env_exe)
 
-        def post_setup(self, context):
-            if not self.with_pip:
-                return
-            print(
-                "Ensuring up-to-date setuptools, pip, and wheel...",
-                end="",
-                flush=True,
-            )
-            env = os.environ.copy()
-            env.update(
-                {
-                    "PIP_DISABLE_PIP_VERSION_CHECK": "1",
-                    "PIP_NO_WARN_CONFLICTS": "1",
-                }
-            )
-            returncode = subprocess.call(
-                [
-                    context.env_exe,
-                    "-m",
-                    "pip",
-                    "install",
-                    "--upgrade",
-                    "--quiet",
-                    "setuptools",
-                    "pip",
-                    "wheel",
-                ],
-                env=env,
-            )
-            if returncode == 0:
-                print("done")
-            else:
-                # If update fails, there should already be a nice error message
-                # from pip present. Just carry on.
-                print()
+
+logger = logging.getLogger(__name__)
 
 
 def get_script(module=None):
@@ -114,6 +82,7 @@ def _create_virtualenv(virtualenv_py, env_dir, system, prompt, bare):
         sys.executable,
         virtualenv_py,
         str(env_dir),
+        "--quiet",
         "--prompt",
         "({}) ".format(prompt),
     ]
@@ -127,28 +96,32 @@ def _create_virtualenv(virtualenv_py, env_dir, system, prompt, bare):
 def _is_venv_usable(needs_pip):
     if not venv:
         if sys.version_info >= (3, 3):
-            print("venv not available, falling back to virtualenv")
+            logger.debug("venv not available, falling back to virtualenv")
         else:
-            print("Using virtualenv")
+            logger.debug("Using virtualenv")
         return False
     if needs_pip:
         try:
             import ensurepip  # noqa
         except ImportError:
-            print(
+            logger.debug(
                 "venv without ensurepip is unuseful, "
                 "falling back to virtualenv"
             )
             return False
     if sys.version_info < (3, 4):
-        print("venv in Python 3.3 is unuseful, falling back to virtualenv")
+        logger.debug(
+            "venv in Python 3.3 is unuseful, falling back to virtualenv"
+        )
         return False
     try:
         sys.real_prefix
     except AttributeError:
-        print("Using venv")
+        logger.debug("Using venv")
         return True
-    print("venv breaks when nested in virtualenv, falling back to virtualenv")
+    logger.debug(
+        "venv breaks when nested in virtualenv, falling back to virtualenv"
+    )
     return False
 
 
@@ -157,6 +130,9 @@ def _create_with_this(env_dir, system, prompt, bare, virtualenv_py):
         _create_venv(env_dir, system, prompt, bare)
     else:
         _create_virtualenv(virtualenv_py, env_dir, system, prompt, bare)
+
+
+VIRTUALENV_NOT_FOUND_CODE = 714  # Arbitrary for IPC.
 
 
 def _create_with_python(python, env_dir, system, prompt, bare, virtualenv_py):
@@ -172,7 +148,12 @@ def _create_with_python(python, env_dir, system, prompt, bare, virtualenv_py):
         virtualenv_py = _find_virtualenv_py()
     if virtualenv_py:
         cmd.extend(["--virtualenv.py", virtualenv_py])
-    subprocess.check_call(cmd)
+    try:
+        subprocess.check_call(cmd)
+    except subprocess.CalledProcessError as e:
+        if e.returncode == VIRTUALENV_NOT_FOUND_CODE:
+            raise VirtualenvNotFound
+        raise  # Don't know what happened, none can do.
 
 
 def create(python, env_dir, system, prompt, bare, virtualenv_py=None):
@@ -217,8 +198,7 @@ def _main(args=None):
             virtualenv_py=opts.script,
         )
     except VirtualenvNotFound:
-        print("virtualenv not available")
-        sys.exit(1)
+        sys.exit(VIRTUALENV_NOT_FOUND_CODE)
 
 
 if __name__ == "__main__":
