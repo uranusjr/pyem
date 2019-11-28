@@ -89,6 +89,9 @@ def remove(project, options) -> int:
         except OSError as e:
             logger.error("Failed to deactivate %s\n%s", runtime.name, e)
             return e.errno
+        deactivated = True
+    else:
+        deactivated = False
 
     try:
         project.remove_runtime(runtime)
@@ -97,7 +100,12 @@ def remove(project, options) -> int:
         logger.error("Failed to remove %s\n%s", env_dir, e)
         return e.errno
 
-    logger.info("Removed virtual environment %s", runtime.name)
+    if deactivated:
+        msg = "Removed and deactivated virtual environment %s"
+    else:
+        msg = "Removed virtual environment %s"
+    logger.info(msg, runtime.name)
+
     return 0
 
 
