@@ -144,8 +144,13 @@ def _create_with_python(python, env_dir, system, prompt, bare, virtualenv_py):
         cmd.extend(["--prompt", prompt])
     if bare:
         cmd.append("--bare")
+
     if not virtualenv_py:
-        virtualenv_py = _find_virtualenv_py()
+        try:
+            virtualenv_py = _find_virtualenv_py()
+        except VirtualenvNotFound:
+            virtualenv_py = None
+
     if virtualenv_py:
         cmd.extend(["--virtualenv.py", virtualenv_py])
     try:
