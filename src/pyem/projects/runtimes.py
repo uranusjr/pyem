@@ -6,6 +6,7 @@ __all__ = [
     "MultipleRuntimeMatches",
     "NoRuntimeMatch",
     "PyUnavailable",
+    "RuntimeActive",
     "RuntimeInvalid",
     "RuntimeExists",
     "VirtualenvNotFound",
@@ -116,6 +117,11 @@ class InterpreterNotFound(Exception):
 
 @dataclasses.dataclass()
 class RuntimeExists(Exception):
+    runtime: Runtime
+
+
+@dataclasses.dataclass()
+class RuntimeActive(Exception):
     runtime: Runtime
 
 
@@ -319,9 +325,8 @@ class ProjectRuntimeManagementMixin(BaseProject):
         return None
 
     def remove_runtime(self, runtime: Runtime):
-        # Deactivate env if it is going to be removed.
         if self.get_active_runtime() == runtime:
-            self._runtime_marker.unlink()
+            raise RuntimeActive(runtime)
         if runtime.root.is_symlink():
             runtime.root.unlink()
         else:

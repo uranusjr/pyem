@@ -83,11 +83,18 @@ def _multiple_runtime_matches(e: runtimes.MultipleRuntimeMatches) -> int:
 def remove(project, options) -> int:
     runtime = project.find_runtime(options.spec)
 
+    if project.get_active_runtime() == runtime:
+        try:
+            project.deactivate_runtime()
+        except OSError as e:
+            logger.error("Failed to deactivate %s\n%s", runtime.name, e)
+            return e.errno
+
     try:
         project.remove_runtime(runtime)
     except OSError as e:
         env_dir = runtime.root.relative_to(project.root)
-        logger.warn("Failed to remove %s\n%s", env_dir, e)
+        logger.error("Failed to remove %s\n%s", env_dir, e)
         return e.errno
 
     logger.info("Removed virtual environment %s", runtime.name)
