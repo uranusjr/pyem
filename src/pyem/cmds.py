@@ -23,11 +23,16 @@ logger = logging.getLogger(__name__)
 
 def _iter_until_subcommand(iterator: _ArgIter) -> _ArgIter:
     next(iterator)  # Skip argv[0].
+    keep_next = False
     for arg in iterator:
         yield arg
-        if not arg.startswith("-"):  # Subcommand met.
+        if keep_next:
+            keep_next = False
+        elif not arg.startswith("-"):  # Subcommand met.
             return
-    yield ""
+        if "=" not in arg:
+            keep_next = True
+    yield ""  # Stub subcommand if the arg list is completely empty.
 
 
 def _partition_argv(argv: _ArgList) -> typing.Tuple[_ArgList, str, _ArgList]:
