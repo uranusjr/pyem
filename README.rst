@@ -12,26 +12,27 @@ Install
 
 I recommend using pipx_::
 
-  pipx install pyem --spec="pyem[compat]"
+    pipx install pyem
 
-The "compat" extra also installs virtualenv_ to support old Python versions
-without the builtin ``venv`` module. You can drop it if you don't need this.
-(You can always ``pipx inject`` virtualenv back if you need to.)
+    # If you need to support Python without the builtin venv module.
+    pipx inject pyem virtualenv
 
 .. _pipx: https://pipxproject.github.io/pipx/
-.. _virtualenv: https://virtualenv.pypa.io/en/stable/
 
 
 In Action
 =========
 
-Add a virtual environment::
+Add a virtual environment besides the file ``pyproject.toml``::
 
-    $ pyem venv add python3.7  # Based on a command.
+    # Based on a command.
+    pyem venv add python3.7
 
-    $ pyem venv add 3.6  # Based on interpreter found by the Python launcher.
+    # Based on interpreter found by the Python launcher.
+    pyem venv add 3.6
 
-    $ pyem venv add /usr/local/bin/pypy3  # Based on an executable.
+    # Based on an executable.
+    pyem venv add /usr/local/bin/pypy3
 
 The second variant relies on the `Python launcher`_ to locate an interpreter.
 This tool should be installed by default if you use the officlal installer on
@@ -87,9 +88,16 @@ should also integrate seamlessly.
 .. _Poetry: https://poetry.eustace.io
 .. _Pipenv: https://github.com/pypa/pipenv
 
-Flit_ is more difficult to trick since it does not automatically inspect
-environment variables like other tools do. Use this workaround instead
-(requires the Python launcher)::
+
+Tips and Tricks
+===============
+
+Flit on Windows
+---------------
+
+Flit_ has problems detecting the active virtual environment on Windows when
+installed into Python 3.7.2 or later. Use the following workaround (requires
+the Python launcher)::
 
     $ pyem flit install --python=py
 
@@ -99,3 +107,32 @@ Starting from Flit 2.1, you can also set the environment variable
 ``FLIT_INSTALL_PYTHON=py`` for the same effect. This is a good default even
 when you're not using PyEM IMO; it makes more sense than installing into Flit's
 environment.
+
+This has been fixed in master (`takluyver/flit#300`_), so Flit *after* 2.1.0
+does not need this workaround.
+
+.. _`takluyver/flit#300`: https://github.com/takluyver/flit/pull/300
+
+
+Project without ``pyproject.toml``
+----------------------------------
+
+If your project does not use ``pyproject.toml``, you can specify the project
+root explicitly::
+
+    pyem --project=./myproject add 3.8
+
+The ``--project`` option is only required when creating a virtual environment.
+Subsequent commands should pick up the ``.venvs`` directory automatically, and
+use its location as the project root, even without the presence of
+``pyproject.toml``.
+
+
+Call a virtual environment outside the project root
+---------------------------------------------------
+
+The ``--project`` option is also handy if you want to access a virtual
+environment when you're outside of the project root. This command lists
+installed packages in the 3.7 virtual environment of ``another-project``::
+
+    pyem --project=../another-project --python=3.7 pip list
