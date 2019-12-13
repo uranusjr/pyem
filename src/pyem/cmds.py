@@ -1,15 +1,17 @@
 __all__ = ["dispatch"]
 
 import argparse
+import dataclasses
 import functools
 import logging
+import pathlib
 import sys
 import typing
 
 from . import __version__, procs, venvs
 from ._logging import configure_logging
 from .errs import Error
-from .projects import Project, ProjectNotFound
+from .projects import Project
 
 
 _ArgIter = typing.Iterator[str]
@@ -138,23 +140,57 @@ def _parse_args(argv: _ArgList) -> _Options:
     return _parse_for_bridge(before_cmd, cmd, after_cmd)
 
 
+@dataclasses.dataclass()
+class _ProjectNotFound(Exception):
+    start: pathlib.Path
+
+
+# Ways to specify a project root. The .venvs directory is checked before
+# pyproject.toml, so an outer .venvs directory has precedence over an inner
+# pyproject.toml. This is important to resolve nested projects, where we
+# usually want to reach environments set up in the outmost project, instead of
+# creating new ones for each inner project.
+
+_DiscoveryVariant = typing.Tuple[str, typing.Callable[[pathlib.Path], bool]]
+
+_DISCOVERY_VARIANTS: typing.List[_DiscoveryVariant] = [
+    (".venvs", pathlib.Path.is_dir),
+    ("pyproject.toml", pathlib.Path.is_file),
+]
+
+
+def _project_from_path(start: pathlib.Path) -> Project:
+    path = start.resolve()
+    if any(path.name == n and f(path) for n, f in _DISCOVERY_VARIANTS):
+        path = path.parent
+    if path.is_dir():
+        return Project(path)
+    raise _ProjectNotFound(start)
+
+
+def _project_from_discovery() -> Project:
+    start = pathlib.Path.cwd()
+    for marker, check in _DISCOVERY_VARIANTS:
+        for path in start.joinpath(marker).parents:
+            if check(path.joinpath(marker)):
+                return Project(path)
+    raise _ProjectNotFound(start)
+
+
 def dispatch(argv: typing.Optional[_ArgList]) -> int:
     configure_logging(logging.INFO)  # TODO: Make this configurable.
 
     if argv is None:
         argv = sys.argv
-
     opts = _parse_args(argv)
 
-    # If we specify an explicit path, we only want to search the specified
-    # directory (or the directory containing the specified file), i.e. up 0
-    # times. Otherwise we search indefinitely (up=None).
-    up = 0 if opts.project else None
-
     try:
-        project = Project.discover(opts.project, up=up)
-    except ProjectNotFound as e:
-        logger.error("No pyproject.toml found in %s", e.start)
+        if opts.project is not None:
+            project = _project_from_path(pathlib.Path(opts.project))
+        else:
+            project = _project_from_discovery()
+    except _ProjectNotFound as e:
+        logger.error("No valid project from %s", e.start)
         return Error.project_not_found
 
     return opts.func(project, opts)
