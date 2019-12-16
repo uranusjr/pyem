@@ -32,7 +32,7 @@ def _iter_until_subcommand(iterator: _ArgIter) -> _ArgIter:
             keep_next = False
         elif not arg.startswith("-"):  # Subcommand met.
             return
-        if "=" not in arg:
+        elif "=" not in arg:
             keep_next = True
     yield ""  # Stub subcommand if the arg list is completely empty.
 
