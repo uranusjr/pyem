@@ -1,6 +1,5 @@
 __all__ = ["dispatch"]
 
-import argparse
 import dataclasses
 import functools
 import logging
@@ -9,6 +8,7 @@ import sys
 import typing
 
 from . import __version__, procs, venvs
+from ._argparse import PyEMArgumentParser
 from ._logging import configure_logging
 from .errs import Error
 from .projects import Project
@@ -49,24 +49,6 @@ _MISSING_PARSER_EPILOG = (
 )
 
 
-class PyEMArgumentParser(argparse.ArgumentParser):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.add_argument(
-            "--project",
-            help="alternative path marking the project root",
-            metavar="PATH",
-            default=None,
-        )
-
-    def add_subparsers(self, **kwargs):
-        # Revert to the basic parser class to avoid root arguments from being
-        # defined in subparsers.
-        if "parser_class" not in kwargs:
-            kwargs["parser_class"] = argparse.ArgumentParser
-        return super().add_subparsers(**kwargs)
-
-
 def _parse_missing(argv: _ArgList) -> _Options:
     parser = PyEMArgumentParser(epilog=_MISSING_PARSER_EPILOG)
     parser.add_argument(
@@ -94,13 +76,17 @@ def _parse_for_venv(argv: _ArgList) -> _Options:
     parser_add.set_defaults(func=venvs.add)
 
     parser_rm = subparsers.add_parser(
-        "remove", description="Remove a virtual environment from this project."
+        "remove",
+        aliases=["rm"],
+        description="Remove a virtual environment from this project.",
     )
     parser_rm.add_argument("spec", help="venv specifier")
     parser_rm.set_defaults(func=venvs.remove)
 
     parser_set = subparsers.add_parser(
-        "set", description="Set the project's default virtual environment."
+        "set",
+        aliases=["use"],
+        description="Set the project's default virtual environment.",
     )
     parser_set.add_argument("spec", help="venv specifier")
     parser_set.set_defaults(func=venvs.activate)
