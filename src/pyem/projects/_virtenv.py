@@ -81,7 +81,7 @@ def _create_virtualenv(virtualenv_py, env_dir, system, prompt, bare):
     cmd = [
         sys.executable,
         virtualenv_py,
-        str(env_dir),
+        os.fspath(env_dir),
         "--quiet",
         "--prompt",
         "({}) ".format(prompt),
@@ -137,7 +137,7 @@ VIRTUALENV_NOT_FOUND_CODE = 714  # Arbitrary for IPC.
 
 def _create_with_python(python, env_dir, system, prompt, bare, virtualenv_py):
     # Delegate everything into a subprocess. Trick learned from virtualenv.
-    cmd = [python, get_script(), str(env_dir)]
+    cmd = [python, get_script(), os.fspath(env_dir)]
     if system:
         cmd.append("--system")
     if prompt:

@@ -43,7 +43,7 @@ class _Runnable:
 
         env = os.environ.copy()
         env["PATH"] = runtime.derive_environ_path()
-        env["VIRTUAL_ENV"] = str(runtime.root)
+        env["VIRTUAL_ENV"] = os.fspath(runtime.root)
         self._env = env
 
     def _resolve_command(self) -> typing.Optional[str]:
@@ -58,7 +58,7 @@ class _Runnable:
         # resolve symlinks here because venv relies on the symlink's location
         # to detect venv invocation.
         if not path.is_symlink():
-            command = str(path.resolve())
+            command = os.fspath(path.resolve())
 
         return command
 

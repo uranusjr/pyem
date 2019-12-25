@@ -110,7 +110,7 @@ def get_interpreter_quintuplet(python: typing.Union[str, pathlib.Path]) -> str:
 
     Example: `cpython-3.7-darwin-x86_64-3d3725a6`.
     """
-    return _get_command_output([str(python), "-c", _VENV_NAME_CODE])
+    return _get_command_output([os.fspath(python), "-c", _VENV_NAME_CODE])
 
 
 @dataclasses.dataclass()
@@ -121,7 +121,7 @@ class EnvironmentCreationError(Exception):
 def create_venv(python: os.PathLike, env_dir: pathlib.Path, prompt: str):
     try:
         _virtenv.create(
-            python=str(python),
+            python=os.fspath(python),
             env_dir=env_dir,
             system=False,
             prompt=prompt,
