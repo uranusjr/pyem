@@ -22,7 +22,7 @@ class PyUnavailable(Exception):
 
 
 def _get_command_output(args: typing.Sequence[str]) -> str:
-    return subprocess.check_output(args, errors="replace", text=True).strip()
+    return subprocess.check_output(args, text=True).strip()
 
 
 _PY_VER_RE = re.compile(
