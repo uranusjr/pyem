@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 __all__ = ["Project", "Runtime"]
 
 from .base import BaseProject

@@ -12,7 +12,6 @@ import pathlib
 import re
 import shutil
 import subprocess
-import sys
 import typing
 
 from . import _virtenv
@@ -23,7 +22,7 @@ class PyUnavailable(Exception):
 
 
 def _get_command_output(args: typing.Sequence[str]) -> str:
-    return subprocess.check_output(args).decode(sys.stdout.encoding).strip()
+    return subprocess.check_output(args, errors="replace", text=True).strip()
 
 
 _PY_VER_RE = re.compile(
