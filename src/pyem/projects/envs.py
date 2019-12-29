@@ -21,8 +21,8 @@ class PyUnavailable(Exception):
     pass
 
 
-def _get_command_output(args: typing.Sequence[str]) -> str:
-    return subprocess.check_output(args, text=True).strip()
+def _get_command_output(args: typing.Sequence[str], **kwargs) -> str:
+    return subprocess.check_output(args, text=True, **kwargs).strip()
 
 
 _PY_VER_RE = re.compile(
@@ -43,7 +43,9 @@ def _find_python_with_py(python: str) -> typing.Optional[pathlib.Path]:
         raise PyUnavailable()
     code = "import sys; print(sys.executable)"
     try:
-        output = _get_command_output([py, f"-{python}", "-c", code])
+        output = _get_command_output(
+            [py, f"-{python}", "-c", code], stderr=subprocess.DEVNULL,
+        )
     except subprocess.CalledProcessError:
         return None
     if not output:
