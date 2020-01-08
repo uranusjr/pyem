@@ -80,8 +80,8 @@ def _create_virtualenv(virtualenv_py, env_dir, system, prompt, bare):
         prompt = os.path.basename(env_dir)
     cmd = [
         sys.executable,
-        virtualenv_py,
-        os.fspath(env_dir),
+        str(virtualenv_py),
+        str(env_dir),
         "--quiet",
         "--prompt",
         "({}) ".format(prompt),
