@@ -118,10 +118,25 @@ class _NTRunnable(_Runnable):
         return f"{cmd} {arg}"
 
     def run(self) -> int:
-        proc = self._resolve_command()
-        if proc:
-            return subprocess.call([proc, *self._args], env=self._env)
-        return subprocess.call(self._cmdify(), shell=True)
+        command = self._resolve_command()
+        if command:
+            proc = subprocess.Popen([command, *self._args], env=self._env)
+        else:
+            proc = subprocess.Popen(self._cmdify(), shell=True)
+
+        # This mimics the stdlib implementation of subprocess.call(), but
+        # catches KeyboardInterrupt bubbled up from the child process, so
+        # the parent Python wrapper can exit cleanly with the correct code.
+        try:
+            with proc:
+                proc.wait()
+        except KeyboardInterrupt:
+            pass
+        except BaseException:
+            proc.kill()
+            raise
+
+        return proc.returncode
 
 
 def run(project: Project, options) -> int:
