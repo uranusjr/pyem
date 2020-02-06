@@ -23,7 +23,7 @@ def _detect_virtualenv_20() -> typing.Optional[typing.Any]:
 
 
 def _run_virtualenv(python: pathlib.Path, env_dir: pathlib.Path, prompt: str):
-    import virtualenv.run
+    import virtualenv.run  # type: ignore
 
     args = [
         "--python",
@@ -47,7 +47,7 @@ class VirtualenvNotFound(EnvironmentError):
 _VENV_NOT_AVAILABLE = 715  # Arbitrary for IPC.
 
 
-_CREATE_VENV_CODE = f'''
+_CREATE_VENV_CODE = f'''\
 def create_venv(sys, env_dir, prompt):
     try:
         import ensurepip
@@ -80,16 +80,15 @@ def create_venv(sys, env_dir, prompt):
     builder.create(env_dir)
 '''
 
-_CREATE_VENV_INVOKE_CODE = f"""
+_CREATE_VENV_INVOKE_CODE = f"""\
 {_CREATE_VENV_CODE}
-
 import sys
 sys.exit(create_venv(sys, sys.argv[1], sys.argv[2]))
 """
 
 
 def _create_with_this(env_dir: pathlib.Path, prompt: str):
-    env = {}
+    env: typing.Dict[str, typing.Any] = {}
     exec(_CREATE_VENV_CODE, env)
     try:
         returncode = env["create_venv"](sys, os.fspath(env_dir), prompt)
@@ -98,7 +97,7 @@ def _create_with_this(env_dir: pathlib.Path, prompt: str):
     return returncode
 
 
-def _create_with(python: str, env_dir: pathlib.Path, prompt: str):
+def _create_with(python: pathlib.Path, env_dir: pathlib.Path, prompt: str):
     args = [
         os.fspath(python),
         "-c",
