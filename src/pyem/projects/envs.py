@@ -1,20 +1,15 @@
 __all__ = [
-    "EnvironmentCreationError",
     "PyUnavailable",
-    "create_venv",
     "get_interpreter_quintuplet",
     "resolve_python",
 ]
 
-import dataclasses
 import os
 import pathlib
 import re
 import shutil
 import subprocess
 import typing
-
-from . import _virtenv
 
 
 class PyUnavailable(Exception):
@@ -113,21 +108,3 @@ def get_interpreter_quintuplet(python: typing.Union[str, pathlib.Path]) -> str:
     Example: `cpython-3.7-darwin-x86_64-3d3725a6`.
     """
     return _get_command_output([os.fspath(python), "-c", _VENV_NAME_CODE])
-
-
-@dataclasses.dataclass()
-class EnvironmentCreationError(Exception):
-    context: Exception
-
-
-def create_venv(python: os.PathLike, env_dir: pathlib.Path, prompt: str):
-    try:
-        _virtenv.create(
-            python=os.fspath(python),
-            env_dir=env_dir,
-            system=False,
-            prompt=prompt,
-            bare=False,
-        )
-    except subprocess.CalledProcessError as e:
-        raise EnvironmentCreationError(e)

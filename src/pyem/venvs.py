@@ -37,7 +37,7 @@ def add(project, options) -> int:
         return Error.py_unavailable
     except runtimes.VirtualenvNotFound:
         logger.error(
-            "Requires virtualenv to create a virtual environment for %r",
+            "Requires virtualenv 20.0+ to create a virtual environment for %s",
             options.python,
         )
         return Error.virtualenv_unavailable

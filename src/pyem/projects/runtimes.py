@@ -21,15 +21,17 @@ import pathlib
 import shutil
 import typing
 
+from ._venv import (
+    EnvironmentCreationError,
+    VirtualenvNotFound,
+    create as create_venv,
+)
 from .base import BaseProject
 from .envs import (
-    EnvironmentCreationError,
     PyUnavailable,
-    create_venv,
     get_interpreter_quintuplet,
     resolve_python,
 )
-from ._virtenv import VirtualenvNotFound
 
 
 _VENV_CONTAINER_NAME = ".venvs"
