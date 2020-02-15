@@ -14,6 +14,13 @@ logger = logging.getLogger(__name__)
 def add(project, options) -> int:
     try:
         runtime = project.create_runtime(options.python)
+    except runtimes.RuntimeExists as e:
+        logger.error(
+            "Virtual environment exists for %r:\n%s",
+            options.python,
+            e.runtime.root,
+        )
+        return Error.runtime_multiple_matches
     except runtimes.InterpreterNotFound:
         logger.error("Not a valid interpreter: %r", options.python)
         return Error.interpreter_not_found
@@ -30,15 +37,15 @@ def add(project, options) -> int:
         return Error.py_unavailable
     except runtimes.VirtualenvNotFound:
         logger.error(
-            "Requires virtualenv to create a virtual environment for %s",
+            "Requires virtualenv to create a virtual environment for %r",
             options.python,
         )
         return Error.virtualenv_unavailable
     except runtimes.EnvironmentCreationError as e:
         logger.error(
-            "Failed to create a virtual environment for %s:\n%s",
+            "Failed to create a virtual environment for %r:\n%r",
             options.python,
-            e,
+            e.context,
         )
         return Error.runtime_invalid
 
