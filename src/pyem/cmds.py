@@ -75,6 +75,14 @@ def _parse_for_venv(argv: _ArgList) -> _Options:
         "add", description="Create a virtual environment for this project."
     )
     parser_add.add_argument("python", help="base interpreter to use")
+    parser_add.add_argument(
+        "--set",
+        "--use",
+        dest="activate",
+        action="store_true",
+        default=False,
+        help="Set the newly created virtual environment as default.",
+    )
     parser_add.set_defaults(func=venvs.add)
 
     parser_rm = subparsers.add_parser(

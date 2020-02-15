@@ -42,14 +42,15 @@ def add(project, options) -> int:
         )
         return Error.runtime_invalid
 
-    try:
-        project.activate_runtime(runtime)
-    except OSError as e:
-        env_dir = runtime.root.relative_to(project.root)
-        logger.warning("Failed to activate %s\n%s", env_dir, e)
-        activated = False
-    else:
-        activated = True
+    activated = False
+    if options.activate or not project.get_active_runtime():
+        try:
+            project.activate_runtime(runtime)
+        except OSError as e:
+            env_dir = runtime.root.relative_to(project.root)
+            logger.warning("Failed to activate %s\n%s", env_dir, e)
+        else:
+            activated = True
 
     if activated:
         msg = "Created and activated virtual environment %s"
