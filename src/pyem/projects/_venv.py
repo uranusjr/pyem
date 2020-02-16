@@ -6,6 +6,15 @@ import sys
 import typing
 
 
+@dataclasses.dataclass()
+class EnvironmentCreationError(Exception):
+    context: Exception
+
+
+class VirtualenvNotFound(EnvironmentError):
+    pass
+
+
 def _detect_virtualenv_20() -> typing.Optional[typing.Any]:
     """Detect virtualenv >=20.0 which has PEP 405 support.
     """
@@ -23,7 +32,7 @@ def _detect_virtualenv_20() -> typing.Optional[typing.Any]:
 
 
 def _run_virtualenv(python: pathlib.Path, env_dir: pathlib.Path, prompt: str):
-    import virtualenv.run
+    import virtualenv
 
     args = [
         "--python",
@@ -32,16 +41,10 @@ def _run_virtualenv(python: pathlib.Path, env_dir: pathlib.Path, prompt: str):
         prompt,
         os.fspath(env_dir),
     ]
-    virtualenv.run.run_via_cli(args)  # TODO: Handle errors.
-
-
-@dataclasses.dataclass()
-class EnvironmentCreationError(Exception):
-    context: Exception
-
-
-class VirtualenvNotFound(EnvironmentError):
-    pass
+    try:
+        virtualenv.cli_run(args)
+    except Exception as e:
+        raise EnvironmentCreationError(e)
 
 
 _VENV_NOT_AVAILABLE = 715  # Arbitrary for IPC.
