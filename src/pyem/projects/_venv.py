@@ -28,6 +28,10 @@ def _detect_virtualenv_20() -> typing.Optional[typing.Any]:
         return None
     if version < 20:
         return None
+    try:
+        virtualenv.cli_run  # Only available since 20.0.3.
+    except AttributeError:
+        return None
     return virtualenv
 
 
