@@ -23,7 +23,7 @@ def _detect_virtualenv_20() -> typing.Optional[typing.Any]:
 
 
 def _run_virtualenv(python: pathlib.Path, env_dir: pathlib.Path, prompt: str):
-    import virtualenv.run  # type: ignore
+    import virtualenv.run
 
     args = [
         "--python",
