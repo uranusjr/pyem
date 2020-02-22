@@ -4,6 +4,7 @@ import typing
 
 
 class Error(enum.IntEnum):
+    unknown = 1
     interpreter_not_found = enum.auto()
     project_not_found = enum.auto()
     py_unavailable = enum.auto()

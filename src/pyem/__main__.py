@@ -8,8 +8,10 @@ import sys
 if not __package__:
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
     from pyem.cmds import dispatch
+    from pyem.errs import Error
 else:
     from .cmds import dispatch
+    from .errs import Error
 
 
 if __name__ == "__main__":
@@ -18,5 +20,5 @@ if __name__ == "__main__":
         code = dispatch(None)
     except KeyboardInterrupt:
         logger.error("User abort!")
-        code = -1
+        code = Error.unknown
     sys.exit(code)
