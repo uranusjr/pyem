@@ -17,5 +17,7 @@ def configure_logging(level):
     else:
         f = logging.Formatter("%(levelname)s: %(message)s")
     h.setFormatter(f)
-    logging.root.addHandler(h)
-    logging.root.setLevel(level)
+
+    logger = logging.getLogger(__name__.split(".", 1)[0])
+    logger.addHandler(h)
+    logger.setLevel(level)
