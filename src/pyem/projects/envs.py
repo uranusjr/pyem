@@ -36,7 +36,7 @@ def _find_python_with_py(python: str) -> typing.Optional[pathlib.Path]:
     py = shutil.which("py")
     if not py:
         raise PyUnavailable()
-    code = "import sys; print(sys.executable)"
+    code = "import sys; print(sys.executable, end='')"
     try:
         output = _get_command_output(
             [py, f"-{python}", "-c", code], stderr=subprocess.DEVNULL,
@@ -45,7 +45,11 @@ def _find_python_with_py(python: str) -> typing.Optional[pathlib.Path]:
         return None
     if not output:
         return None
-    return pathlib.Path(output).resolve()
+    try:
+        path = pathlib.Path(output).resolve(strict=True)
+    except FileNotFoundError:
+        return None
+    return path
 
 
 def resolve_python(python: str) -> typing.Optional[pathlib.Path]:
