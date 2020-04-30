@@ -54,6 +54,7 @@ def _parse_missing(argv: _ArgList) -> _Options:
     parser.add_argument(
         "--version", action="version", version=f"%(prog)s {__version__}"
     )
+    parser.add_argument("--spec", help="venv context to use", default=None)
     parser.add_argument("cmd", help="command to run")
     parser.add_argument(
         "arg", nargs="*", default=None, help="command argument"
