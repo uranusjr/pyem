@@ -134,6 +134,10 @@ def _parse_args(argv: _ArgList) -> _Options:
         return _parse_for_venv(before_cmd + after_cmd)
     if not cmd:
         return _parse_missing(before_cmd)
+    if cmd == "pip":
+        # Special-case pip to invoke "python -m pip" instead.
+        after_cmd = ["-m", "pip", *after_cmd]
+        return _parse_for_bridge(before_cmd, "python", after_cmd)
     return _parse_for_bridge(before_cmd, cmd, after_cmd)
 
 
